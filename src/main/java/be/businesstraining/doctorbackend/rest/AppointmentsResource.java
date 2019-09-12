@@ -39,10 +39,12 @@ public class AppointmentsResource {
         return repository.findAll();
     }
 
-    @GetMapping("/{id}")
-    public Appointment getAppointmentById(@PathVariable Long id) {
+    @GetMapping("/{type}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public List<Appointment> getAppointmentByType(@PathVariable String type) {
 
-        return repository.findById(id).orElse(null);
+//        return repository.findById(id).orElse(null);
+        return repository.findAppointmentsByType(type);
     }
 
     @PostMapping("/{username}")

@@ -3,11 +3,14 @@ package be.businesstraining.doctorbackend.security.controller;
 import be.businesstraining.doctorbackend.model.security.Authority;
 import be.businesstraining.doctorbackend.model.security.User;
 import be.businesstraining.doctorbackend.repository.UserRepository;
+import be.businesstraining.doctorbackend.rest.AppointmentsResource;
 import be.businesstraining.doctorbackend.security.JwtAuthenticationRequest;
 import be.businesstraining.doctorbackend.security.JwtTokenUtil;
 import be.businesstraining.doctorbackend.security.JwtUser;
 import be.businesstraining.doctorbackend.security.repository.AuthorityRepository;
 import be.businesstraining.doctorbackend.security.service.JwtAuthenticationResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -33,6 +36,8 @@ import java.util.Objects;
 @RestController
 @CrossOrigin(origins = "*")
 public class AuthenticationRestController {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(AppointmentsResource.class);
 
     @Value("${jwt.header}")
     private String tokenHeader;
@@ -95,15 +100,23 @@ public class AuthenticationRestController {
 
             // Assigner au user un role initial (USER par exemple)
             List<Authority> authorities = new ArrayList<>();
-            authorities.add(authorityRepository.findById(1L).orElse(null));
+
+            /// Begin
+            Authority roleUser = authorityRepository.findAll().stream().filter(a -> a.getName().toString().equals("ROLE_USER")).findFirst().orElse(null);
+            authorities.add(roleUser);
+
+            /// End
+
+
+            //  authorities.add(authorityRepository.findById(1L).orElse(null));
             newUser.setAuthorities(authorities);
 
             // save() du user dans la BDD (via le repo)
             userRepository.save(newUser);
-            System.out.println("============= AJOUT REUSSI =============");
+            LOGGER.info("============= AJOUT REUSSI =============");
 
         } catch (Exception ex) {
-            System.out.println("============= ECHEC DE L  AJOUT : "+ex);
+            LOGGER.error("============= ECHEC DE L  AJOUT : "+ex);
         }
 
 
